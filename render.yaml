@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: algebraic-equation-solver
+    runtime: docker
+    plan: free
+    healthCheckPath: /actuator/health
