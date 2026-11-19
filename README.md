@@ -7,6 +7,12 @@ Storage is in-memory (as the assignment specifies), so data resets on restart.
 * Swagger UI: `http://localhost:8080/swagger-ui.html`
 * OpenAPI JSON: `http://localhost:8080/v3/api-docs`
 
+## Live demo
+
+* API: https://algebraic-equation-solver-wt0m.onrender.com
+* Swagger UI: https://algebraic-equation-solver-wt0m.onrender.com/swagger-ui.html
+* Hosted on Render's free plan, so the first request after idle can take about a minute. Storage is in-memory, so equations are lost whenever the service restarts: store one first, then evaluate it.
+
 ## Run
 
 Requires JDK 21 and Maven 3.9+.
@@ -84,6 +90,8 @@ text ──Tokenizer──▶ tokens ──InfixToPostfixConverter──▶ post
   tree printing and parse→print→parse round trips, evaluation, division by zero, non-finite results, missing variables.
 * `service/EquationServiceTest`: store/list/evaluate/not-found, concurrent id uniqueness.
 * `api/EquationControllerTest`: full HTTP behaviour via MockMvc (status codes and error bodies).
+
+52 tests in total; CI runs them on every push (see the Actions tab).
 
 ## Deploy (Render, Docker)
 
