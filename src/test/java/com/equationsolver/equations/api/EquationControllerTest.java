@@ -137,4 +137,11 @@ class EquationControllerTest {
         mvc.perform(get("/api/equations/999999")).andExpect(status().isNotFound());
         postJson("/api/equations/999999/evaluate", "{}").andExpect(status().isNotFound());
     }
+
+    @Test
+    void rootRedirectsToSwaggerUi() throws Exception {
+        mvc.perform(get("/"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(header().string("Location", "/swagger-ui.html"));
+    }
 }
