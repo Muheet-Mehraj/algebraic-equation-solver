@@ -3,6 +3,8 @@ package com.equationsolver.equations.api;
 import com.equationsolver.equations.service.EquationService;
 import com.equationsolver.equations.service.StoredEquation;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -34,7 +36,8 @@ public class EquationController {
     @Operation(summary = "Store an equation",
             description = "Parses the infix equation into postfix form, builds the expression tree and stores it.")
     @ApiResponse(responseCode = "201", description = "Equation stored")
-    @ApiResponse(responseCode = "400", description = "Blank, too long or syntactically invalid equation")
+    @ApiResponse(responseCode = "400", description = "Blank, too long or syntactically invalid equation",
+            content = @Content(schema = @Schema(implementation = ApiError.class)))
     public ResponseEntity<StoreEquationResponse> store(@Valid @RequestBody StoreEquationRequest request) {
         StoredEquation stored = service.store(request.equation());
         URI location = ServletUriComponentsBuilder.fromCurrentContextPath()
@@ -46,6 +49,7 @@ public class EquationController {
     @GetMapping
     @Operation(summary = "List stored equations",
             description = "Each equation is reconstructed in infix form by traversing its stored tree.")
+    @ApiResponse(responseCode = "200", description = "All stored equations, oldest first")
     public EquationListResponse list() {
         List<EquationSummary> items = service.findAll().stream().map(EquationSummary::from).toList();
         return new EquationListResponse(items);
@@ -53,7 +57,9 @@ public class EquationController {
 
     @GetMapping("/{equationId}")
     @Operation(summary = "Get one stored equation")
-    @ApiResponse(responseCode = "404", description = "No equation with that id")
+    @ApiResponse(responseCode = "200", description = "The stored equation")
+    @ApiResponse(responseCode = "404", description = "No equation with that id",
+            content = @Content(schema = @Schema(implementation = ApiError.class)))
     public EquationSummary get(@PathVariable String equationId) {
         return EquationSummary.from(service.get(equationId));
     }
@@ -61,9 +67,13 @@ public class EquationController {
     @PostMapping("/{equationId}/evaluate")
     @Operation(summary = "Evaluate an equation",
             description = "Substitutes the given variable values into the stored tree and returns the result.")
-    @ApiResponse(responseCode = "400", description = "Missing, null or non-numeric variable values")
-    @ApiResponse(responseCode = "404", description = "No equation with that id")
-    @ApiResponse(responseCode = "422", description = "Not computable for these values (e.g. division by zero)")
+    @ApiResponse(responseCode = "200", description = "Evaluation result")
+    @ApiResponse(responseCode = "400", description = "Missing, null or non-numeric variable values",
+            content = @Content(schema = @Schema(implementation = ApiError.class)))
+    @ApiResponse(responseCode = "404", description = "No equation with that id",
+            content = @Content(schema = @Schema(implementation = ApiError.class)))
+    @ApiResponse(responseCode = "422", description = "Not computable for these values (e.g. division by zero)",
+            content = @Content(schema = @Schema(implementation = ApiError.class)))
     public EvaluateResponse evaluate(@PathVariable String equationId,
                                      @Valid @RequestBody(required = false) EvaluateRequest request) {
         Map<String, Double> variables = request == null ? Map.of() : request.variablesOrEmpty();

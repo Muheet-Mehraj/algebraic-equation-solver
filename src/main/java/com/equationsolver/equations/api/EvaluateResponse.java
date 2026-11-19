@@ -9,7 +9,7 @@ public record EvaluateResponse(
         String equationId,
         String equation,
         Map<String, Number> variables,
-        @Schema(example = "10", description = "Whole numbers are returned without a decimal part") Number result) {
+        @Schema(example = "11", description = "Whole numbers are returned without a decimal part") Number result) {
 
     /** Echoes the supplied values the way they were written (2, not 2.0). */
     public static Map<String, Number> normalize(Map<String, Double> values) {
